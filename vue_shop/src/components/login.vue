@@ -3,7 +3,7 @@
       <div class="login_box">
 <!--        头像区-->
           <div class="avatar_box">
-              <img src="../assets/logo.png" alt="" srcset="">
+              <img src="../assets/1111.png" alt="" srcset="">
           </div>
 <!--        登录表单区-->
         <el-form ref="loginFormRef" :model="loginForm" label-width="0px" :rules="loginFormRules"  class="login_form">
@@ -98,9 +98,11 @@ export default {
         padding: 10px;
         box-shadow: 0 0 10px;
         background-color: aqua;
+      display: flex;
+      align-items: center;
             img{
                 width: 100%;
-                height: 100%;
+                height: 70%;
                 border-radius: 50%;
                 background-color: aqua;
             }
