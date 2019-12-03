@@ -12,7 +12,7 @@
       <el-row>
 <!--        一列-->
         <el-col>
-          <el-button type="primary">添加角色</el-button>
+          <el-button type="primary" @click="setRoleList">添加角色</el-button>
         </el-col>
       </el-row>
       <el-table :data="rolelist" stripe border style="width: 100%">
@@ -72,6 +72,21 @@
     <el-button type="primary" @click="allotRights">确 定</el-button>
   </span>
     </el-dialog>
+<!--    添加角色对话框-->
+    <el-dialog title="添加角色" :visible.sync="addRoleDialogVisible" width="30%" @close="addRoleDialogVisibleClose">
+      <el-form ref="addRoleForm" :model="roleInfo" label-width="80px" :rules="addRoleRules">
+        <el-form-item label="角色名称" prop="roleName">
+          <el-input v-model="roleInfo.roleName"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述" prop="roleDes">
+          <el-input v-model="roleInfo.roleDes"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="addRoleDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="addRole">确 定</el-button>
+  </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -93,7 +108,17 @@ export default {
       // 默认选中的节点Id值数组
       defKeys: [],
       // 当前即将分配权限的角色id
-      roleId: ''
+      roleId: '',
+      addRoleDialogVisible: false,
+      roleInfo: {
+        roleName: '',
+        roleDes: ''
+      },
+      addRoleRules: {
+        roleName: [
+          { required: true, message: '请输入活动名称', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }]
+      }
     }
   },
   created() {
@@ -139,7 +164,9 @@ export default {
     // 通过递归的形式，获取角色下所有三级权限的id,并保存到defKeys数组中
     getLeafKeys(node, arr) {
       // 如果当前的 node 节点不包含children属性，则是三级节点（因为代表已经是最后一个了）
-      if (!node.children) { return arr.push(node.id) }
+      if (!node.children) {
+        return arr.push(node.id)
+      }
       // 用递归的方法
       node.children.forEach(item => this.getLeafKeys(item, arr))
     },
@@ -163,6 +190,27 @@ export default {
       this.getRolesList()
       // 关闭对话框
       this.setRightDialogVisible = false
+    },
+    setRoleList() {
+      this.$http.post('roles', {})
+      this.addRoleDialogVisible = true
+    },
+    async addRole() {
+      // validate是验证的意思，验证输入的信息是否规范(input是否有红字)
+      this.$refs.addRoleForm.validate(async valid => {
+        if (!valid) return this.$message.error('更新用户信息不规范，请再次修改')
+        const { data: res } = await this.$http.post('roles', {
+          roleName: this.roleInfo.roleName,
+          roleDesc: this.roleInfo.roleDes
+        })
+        if (res.meta.status !== 201) return this.$message.error('添加角色失败')
+        this.$message.success('添加用户成功')
+        this.getRolesList()
+        this.addRoleDialogVisible = false
+      })
+    },
+    addRoleDialogVisibleClose() {
+      this.roleInfo = {}
     }
   }
 }

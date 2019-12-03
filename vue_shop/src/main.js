@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import Router from 'vue-router'
-
+import TreeTable from 'vue-table-with-tree-grid'
 import './plugins/element.js'
 // 导入字体图标
 import './assets/fonts/iconfont.css'
@@ -25,6 +25,8 @@ const originalPush = Router.prototype.push
 Router.prototype.push = function push(location) {
   return originalPush.call(this, location).catch(err => err)
 }
+
+Vue.component('tree-table', TreeTable)
 
 Vue.config.productionTip = false
 
